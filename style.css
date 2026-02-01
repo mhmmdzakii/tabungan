@@ -1,0 +1,67 @@
+body { font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+
+.glass { background: #ffffff; border-radius: 2rem; }
+
+.card-balance { background: linear-gradient(135deg, #2563eb, #6366f1); border-radius: 2.5rem; }
+
+.input-field, .input-field-sm {
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+    background-color: #F1F5F9;
+    border: 2px solid transparent;
+    padding: 14px 18px;
+    border-radius: 1.25rem;
+    outline: none;
+    transition: 0.3s ease;
+    font-size: 14px;
+}
+
+.input-field:focus, .input-field-sm:focus {
+    border-color: #3b82f6;
+    background-color: #fff;
+}
+
+.btn-primary, .btn-success, .btn-dark {
+    width: 100%;
+    padding: 18px;
+    border-radius: 1.25rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 11px;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-primary { background: #2563eb; color: white; box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.4); }
+.btn-success { background: #10b981; color: white; }
+.btn-dark { background: #1e293b; color: white; }
+
+.btn-dark:hover { background: #000; transform: translateY(-2px); }
+
+.history-item {
+    background: white;
+    padding: 18px;
+    border-radius: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #f1f5f9;
+}
+
+#progress-bar {
+    background-image: linear-gradient(45deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
+    background-size: 1rem 1rem;
+    animation: stripes 1s linear infinite;
+}
+
+@keyframes stripes { from { background-position: 1rem 0; } to { background-position: 0 0; } }
+.fade-in { animation: fadeIn 0.4s ease-out forwards; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Scrollbar Style */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
