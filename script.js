@@ -4,17 +4,14 @@ const clientSupabase = supabase.createClient(PROJECT_URL, PROJECT_KEY);
 
 let SEMUA_DATA = [];
 let chartInstansi = null;
-let TARGET_NAMA = localStorage.getItem('goal_nama') || "Belum ada target";
-let TARGET_NOMINAL = parseInt(localStorage.getItem('goal_nom')) || 0;
+let TARGET_NAMA = "Belum ada target";
+let TARGET_NOMINAL = 0;
 
 // --- TAB SYSTEM ---
 function switchTab(tabName) {
-    // Hide all contents
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    // Deactivate all nav links
     document.querySelectorAll('.nav-link').forEach(link => link.classList.remove('active'));
     
-    // Show selected
     document.getElementById('tab-' + tabName).classList.add('active');
     document.getElementById('nav-' + tabName).classList.add('active');
 }
@@ -54,9 +51,74 @@ function toggleAuth(isReg) {
     document.getElementById('reg-form').classList.toggle('hidden', !isReg);
 }
 
+// --- TARGET SYNC FUNCTIONS (DATABASE VERSION) ---
+async function muatTargetDariDB() {
+    const { data: { user } } = await clientSupabase.auth.getUser();
+    if (!user) return;
+
+    const { data, error } = await clientSupabase
+        .from('targets')
+        .select('*')
+        .eq('user_id', user.id)
+        .maybeSingle();
+
+    if (data && !error) {
+        TARGET_NAMA = data.nama_target;
+        TARGET_NOMINAL = data.nominal_target;
+    } else {
+        TARGET_NAMA = "Belum ada target";
+        TARGET_NOMINAL = 0;
+    }
+}
+
+async function simpanTargetBaru() {
+    const { data: { user } } = await clientSupabase.auth.getUser();
+    const n = document.getElementById('set_nama_target').value;
+    const v = document.getElementById('set_nom_target').value;
+
+    if(!n || !v) return Swal.fire('Isi nama & harga!', '', 'warning');
+
+    const { error } = await clientSupabase
+        .from('targets')
+        .upsert({ 
+            user_id: user.id, 
+            nama_target: n, 
+            nominal_target: parseInt(v) 
+        });
+
+    if (!error) {
+        TARGET_NAMA = n;
+        TARGET_NOMINAL = parseInt(v);
+        Swal.fire('Target Terpasang!', 'Sinkron di semua HP', 'success');
+        muatData();
+    }
+}
+
+async function hapusTarget() {
+    const { data: { user } } = await clientSupabase.auth.getUser();
+    const res = await Swal.fire({
+        title: 'Hapus Target?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Ya, Hapus'
+    });
+
+    if (res.isConfirmed) {
+        await clientSupabase.from('targets').delete().eq('user_id', user.id);
+        TARGET_NAMA = "Belum ada target";
+        TARGET_NOMINAL = 0;
+        muatData();
+        Swal.fire('Terhapus', '', 'success');
+    }
+}
+
 // --- DATA FUNCTIONS ---
 async function muatData() {
     const { data: { user } } = await clientSupabase.auth.getUser();
+    if (!user) return;
+
+    await muatTargetDariDB();
+
     const { data, error } = await clientSupabase.from('tabungan').select('*').eq('user_id', user.id).order('created_at', { ascending: false });
     if (!error) {
         SEMUA_DATA = data;
@@ -105,6 +167,15 @@ function renderData(dataList) {
     renderChart(dataList);
 }
 
+function updateGoalUI(total) {
+    const percent = TARGET_NOMINAL > 0 ? Math.min((total / TARGET_NOMINAL) * 100, 100) : 0;
+    const sisa = Math.max(TARGET_NOMINAL - total, 0);
+    document.getElementById('nama-target').innerText = TARGET_NAMA.toUpperCase();
+    document.getElementById('persen-goal').innerText = Math.floor(percent) + "%";
+    document.getElementById('progress-bar').style.width = percent + "%";
+    document.getElementById('sisa-target').innerText = TARGET_NOMINAL === 0 ? "Pasang target baru di bawah" : (sisa <= 0 ? "TARGET TERCAPAI! ✨" : `Kurang Rp ${sisa.toLocaleString()} lagi!`);
+}
+
 function renderChart(dataList) {
     const ctx = document.getElementById('myChart').getContext('2d');
     const reversed = [...dataList].reverse();
@@ -126,26 +197,6 @@ function updateBadge(total) {
     if (total >= 10000000) { icon.innerText="💎"; name.innerText="Diamond Member"; }
     else if (total >= 1000000) { icon.innerText="🥇"; name.innerText="Gold Member"; }
     else { icon.innerText="🥉"; name.innerText="Bronze Member"; }
-}
-
-function updateGoalUI(total) {
-    const percent = Math.min((total / TARGET_NOMINAL) * 100, 100);
-    const sisa = Math.max(TARGET_NOMINAL - total, 0);
-    document.getElementById('nama-target').innerText = TARGET_NAMA.toUpperCase();
-    document.getElementById('persen-goal').innerText = Math.floor(percent) + "%";
-    document.getElementById('progress-bar').style.width = percent + "%";
-    document.getElementById('sisa-target').innerText = sisa <= 0 ? "TARGET TERCAPAI! ✨" : `Kurang Rp ${sisa.toLocaleString()} lagi!`;
-}
-
-function simpanTargetBaru() {
-    const n = document.getElementById('set_nama_target').value;
-    const v = document.getElementById('set_nom_target').value;
-    if(!n || !v) return;
-    localStorage.setItem('goal_nama', n);
-    localStorage.setItem('goal_nom', v);
-    TARGET_NAMA = n; TARGET_NOMINAL = parseInt(v);
-    muatData();
-    Swal.fire('Target Terpasang!', '', 'success');
 }
 
 async function hapusData(id) {
