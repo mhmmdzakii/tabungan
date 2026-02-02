@@ -22,26 +22,33 @@
             border-radius: 1.5rem;
         }
 
+        /* Konten Tab */
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease-out; }
+        .tab-content.active { display: block; animation: slideUp 0.4s ease-out; }
 
+        /* Gaya Link Navbar */
         .nav-link { 
             font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em;
             color: #94a3b8; transition: 0.3s; cursor: pointer; padding: 8px 12px; border-radius: 10px;
         }
         .nav-link.active { color: #2563eb; background: #eff6ff; }
 
+        /* Card Saldo Mewah */
         .card-balance {
             background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
             border-radius: 24px;
             box-shadow: 0 20px 25px -5px rgba(59, 130, 246, 0.2);
         }
 
-        .btn-main { padding: 12px; border-radius: 1rem; font-weight: 800; text-transform: uppercase; font-size: 11px; transition: 0.3s; }
+        .btn-main { padding: 12px; border-radius: 1rem; font-weight: 800; text-transform: uppercase; font-size: 11px; transition: 0.3s; cursor: pointer; }
         .input-field-sm { width: 100%; background: #F1F5F9; border: 2px solid transparent; padding: 12px; border-radius: 1rem; outline: none; transition: 0.3s; }
         .input-field-sm:focus { border-color: #3b82f6; background: white; }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        /* Animasi Transisi */
+        @keyframes slideUp { 
+            from { opacity: 0; transform: translateY(20px); } 
+            to { opacity: 1; transform: translateY(0); } 
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -51,7 +58,7 @@
             <div class="bg-blue-600 p-2 rounded-xl shadow-lg shadow-blue-200">
                 <span class="text-white text-xs">💎</span>
             </div>
-            <span class="hidden md:block font-black text-slate-800 text-sm tracking-tighter">TABUNGANKU</span>
+            <span class="hidden md:block font-black text-slate-800 text-sm tracking-tighter uppercase">TabunganKu</span>
         </div>
         
         <div class="flex gap-1">
@@ -64,23 +71,23 @@
     </nav>
 
     <div id="auth-section" class="max-w-md mx-auto glass p-8 shadow-2xl mt-10">
-        <div id="login-form" class="fade-in text-center">
+        <div id="login-form" class="text-center">
             <h2 class="text-2xl font-black text-slate-800 uppercase mb-6">Diamond Login</h2>
             <div class="space-y-4">
                 <input id="login_email" type="email" placeholder="Email" class="input-field-sm">
                 <input id="login_pass" type="password" placeholder="Password" class="input-field-sm">
                 <button onclick="handleLogin()" class="btn-main w-full bg-blue-600 text-white">Masuk</button>
-                <p class="text-sm">Belum punya akun? <a href="#" onclick="toggleAuth(true)" class="text-blue-600 font-bold">Daftar</a></p>
+                <p class="text-sm mt-4">Belum punya akun? <a href="#" onclick="toggleAuth(true)" class="text-blue-600 font-bold">Daftar</a></p>
             </div>
         </div>
 
-        <div id="reg-form" class="hidden fade-in text-center">
-            <h2 class="text-2xl font-black text-slate-800 uppercase mb-6">Create Account</h2>
+        <div id="reg-form" class="hidden text-center">
+            <h2 class="text-2xl font-black text-slate-800 uppercase mb-6">Buat Akun</h2>
             <div class="space-y-4">
                 <input id="reg_email" type="email" placeholder="Email" class="input-field-sm">
                 <input id="reg_pass" type="password" placeholder="Password" class="input-field-sm">
                 <button onclick="handleSignUp()" class="btn-main w-full bg-emerald-500 text-white">Daftar</button>
-                <p class="text-sm">Sudah punya akun? <a href="#" onclick="toggleAuth(false)" class="text-blue-600 font-bold">Login</a></p>
+                <p class="text-sm mt-4">Sudah punya akun? <a href="#" onclick="toggleAuth(false)" class="text-blue-600 font-bold">Login</a></p>
             </div>
         </div>
     </div>
@@ -128,28 +135,31 @@
         </div>
 
         <div id="tab-target" class="tab-content space-y-6">
-            <div class="glass p-8 text-center border-2 border-dashed border-blue-200">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4">Dream Target</h3>
-                <h2 id="nama-target" class="text-2xl font-black text-slate-800">---</h2>
-                <div class="my-6">
-                    <div class="flex justify-between text-[10px] font-black mb-2">
-                        <span>PROGRESS</span>
+            <div class="glass p-8 text-center border-2 border-dashed border-blue-200 relative">
+                <button onclick="hapusTarget()" class="absolute top-4 right-4 text-xs font-bold text-red-400 hover:text-red-600 transition uppercase">Hapus Dream 🗑️</button>
+                
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Target Impian Kamu</h3>
+                <h2 id="nama-target" class="text-3xl font-black text-slate-800 uppercase tracking-tighter">---</h2>
+                
+                <div class="my-8">
+                    <div class="flex justify-between text-[10px] font-black mb-2 uppercase">
+                        <span>Progress Menuju Target</span>
                         <span id="persen-goal">0%</span>
                     </div>
-                    <div class="w-full bg-slate-100 h-4 rounded-full overflow-hidden">
-                        <div id="progress-bar" class="bg-blue-600 h-full transition-all duration-1000" style="width: 0%"></div>
+                    <div class="w-full bg-slate-100 h-5 rounded-full overflow-hidden shadow-inner">
+                        <div id="progress-bar" class="bg-blue-600 h-full transition-all duration-1000 shadow-lg" style="width: 0%"></div>
                     </div>
                 </div>
-                <p id="sisa-target" class="text-sm font-bold text-blue-600"></p>
+                <p id="sisa-target" class="text-sm font-bold text-blue-600 bg-blue-50 py-2 rounded-xl"></p>
             </div>
 
             <div class="glass p-6">
-                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4">Ganti Target Baru</h3>
+                <h3 class="text-[10px] font-black text-slate-400 uppercase mb-4 tracking-widest">Setel / Ganti Dream Baru</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <input id="set_nama_target" type="text" placeholder="Beli apa?" class="input-field-sm">
-                    <input id="set_nom_target" type="number" placeholder="Harga Rp" class="input-field-sm">
+                    <input id="set_nama_target" type="text" placeholder="Contoh: Beli PS5" class="input-field-sm font-bold">
+                    <input id="set_nom_target" type="number" placeholder="Target Harga Rp" class="input-field-sm font-bold">
                 </div>
-                <button onclick="simpanTargetBaru()" class="btn-main w-full bg-blue-600 text-white mt-4">Pasang Target Sekarang</button>
+                <button onclick="simpanTargetBaru()" class="btn-main w-full bg-blue-600 text-white mt-4 shadow-lg shadow-blue-200">Pasang Target Sekarang</button>
             </div>
         </div>
 
